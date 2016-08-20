@@ -5,6 +5,9 @@
   	"FuseJS"
   ],
   "Includes": [
-    "*"
+    "app/**"
+  ],
+  "Projects": [
+  	"vendor/fuse-components/fuse-components.unoproj"
   ]
 }

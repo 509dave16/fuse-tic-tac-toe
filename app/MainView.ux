@@ -1,2 +1,5 @@
 <App>
+	<Panel>
+		<MyHelloWorldText></MyHelloWorldText>
+	</Panel>
 </App>
