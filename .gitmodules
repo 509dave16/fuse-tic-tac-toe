@@ -1,0 +1,3 @@
+[submodule "vendor/fuse-components"]
+	path = vendor/fuse-components
+	url = https://github.com/509dave16/fuse-components
