@@ -1,5 +1,6 @@
 <App>
-	<Panel>
+	<StackPanel>
 		<MyHelloWorldText></MyHelloWorldText>
-	</Panel>
+		<MyHelloWorldText></MyHelloWorldText>
+	</StackPanel>
 </App>
