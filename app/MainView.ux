@@ -1,6 +1,24 @@
 <App>
-	<StackPanel>
-		<MyHelloWorldText></MyHelloWorldText>
-		<MyHelloWorldText></MyHelloWorldText>
-	</StackPanel>
+	<JavaScript>
+		var GridUtility = require("./js/GridUtility");
+    var ObservableUtility = require("./js/ObservableUtility");
+		var cells = GridUtility.createGrid(3, 3, "5", true, true);
+    var observedCells = ObservableUtility.observeEachItem(cells);
+    var someFunk = function(args) { 
+      
+    };
+		module.exports = { cells: observedCells, cellHandler: someFunk };
+	</JavaScript>
+  <DockPanel>
+    <Grid Dock="Top" RowCount="3" Rows="1*,1*,1*" ColumnCount="3" Columns="1*,1*,1*" Height="60%">
+      <Each Items="{cells}">
+        <BorderedElement Row="{position.row}" Column="{position.column}" TemplateToInclude="CellTemplate" Top="{borderWidths.top}" Bottom="{borderWidths.bottom}" Left="{borderWidths.left}" Right="{borderWidths.right}" BorderColor="#abd3ff">
+          <EventButton ux:Template="CellTemplate" Text="{contents}" ClickedArgs="{position}" BackgroundColor="#1483ff" TextColor="#abd3ff" >
+              <OnUserEvent EventName="EventButtonClicked" Handler="{cellHandler}"/>
+          </EventButton>
+        </BorderedElement>
+      </Each>
+    </Grid>
+      <EventButton Dock="Bottom"/>
+  </DockPanel>
 </App>
