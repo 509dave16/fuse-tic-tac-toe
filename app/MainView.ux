@@ -1,24 +1,76 @@
 <App>
 	<JavaScript>
+    debugger;
+    var Observable = require("FuseJS/Observable")
 		var GridUtility = require("./js/GridUtility");
     var ObservableUtility = require("./js/ObservableUtility");
+    var TicTacToeManager = require("./js/TicTacToeManager");
 		var cells = GridUtility.createGrid(3, 3, "5", true, true);
-    var observedCells = ObservableUtility.observeEachItem(cells);
-    var someFunk = function(args) { 
-      
+    var cellObservables = ObservableUtility.observeEachItem(cells);
+    var sequenceStates = TicTacToeManager.createSequences(cellObservables, 3);
+    var turn = Observable('X');
+    var madeMove = Observable(false);
+    var status = Observable("X's Turn");
+    var gameOver = Observable(false);
+
+    var completeSequencesNumber = sequenceStates.count(function (state) {
+      return state === 'complete';
+    });
+
+    var incompleteSequencesNumber = sequenceStates.count(function (state) {
+      return state === 'incomplete';
+    });
+
+    var gameState = Observable(function() {
+      var value = "";
+      if(completeSequencesNumber.value > 0) {
+        value = "winner";
+      } else if(incompleteSequencesNumber.value === 0) {
+        value = "draw";
+      } else {
+        value = "turn";
+      }
+      return value;
+    });
+  
+    gameState.addSubscriber(function(state) {
+      if(state.value === "winner") {
+        status.value = turn.value + " Won!";
+        gameOver.value = true;
+      } else if(state.value === "draw" && !gameOver.value) {
+        status.value = "Draw";
+        gameOver.value = true;
+      } else if(state.value === "turn" && madeMove.value && !gameOver.value) {
+        madeMove.value = false;
+        turn.value = turn.value === "X" ? "O" : "X";
+        status.value = turn.value + "'s Turn";
+      }
+    });
+
+    var makeMove = function(args) { 
+      var index = args.index;
+      var cell = cellObservables[index].value;
+      if(cell.contents === "" && !gameOver.value) {
+        madeMove.value = true;
+        cell.contents = turn.value;
+        cellObservables[index].value = cell;
+      }
     };
-		module.exports = { cells: observedCells, cellHandler: someFunk };
+		module.exports = { cells: cellObservables, EventHandler: makeMove, status: status };
 	</JavaScript>
-  <DockPanel>
-    <Grid Dock="Top" RowCount="3" Rows="1*,1*,1*" ColumnCount="3" Columns="1*,1*,1*" Height="60%">
+  <StackPanel>
+    <Grid RowCount="3" Rows="1*,1*,1*" ColumnCount="3" Columns="1*,1*,1*" Height="60%">
       <Each Items="{cells}">
         <BorderedElement Row="{position.row}" Column="{position.column}" TemplateToInclude="CellTemplate" Top="{borderWidths.top}" Bottom="{borderWidths.bottom}" Left="{borderWidths.left}" Right="{borderWidths.right}" BorderColor="#abd3ff">
           <EventButton ux:Template="CellTemplate" Text="{contents}" ClickedArgs="{position}" BackgroundColor="#1483ff" TextColor="#abd3ff" >
-              <OnUserEvent EventName="EventButtonClicked" Handler="{cellHandler}"/>
+              <OnUserEvent EventName="EventButtonClicked" Handler="{EventHandler}"/>
           </EventButton>
         </BorderedElement>
       </Each>
     </Grid>
-      <EventButton Dock="Bottom"/>
-  </DockPanel>
+    <StackPanel Height="20%" Orientation="Horizontal">
+      <Text Value="GameStatus: " />
+      <Text Value="{status}" />
+    </StackPanel>
+  </StackPanel>
 </App>

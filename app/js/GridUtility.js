@@ -10,6 +10,8 @@ function createGrid
       cell.position = {};
       cell.position.row = rowIndex;
       cell.position.column = columnIndex;
+      if(flattened)
+        cell.position.index = grid.length;      
       cell.borderWidths = noOuterBorder ? 
         getBorderWidthsForNoOuterBorder(rowIndex, (numOfRows - 1), columnIndex, (numOfCols - 1), cellBorderWidth) : 
         getBorderWidths(cellBorderWidth);
