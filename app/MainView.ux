@@ -1,65 +1,78 @@
 <App>
 	<JavaScript>
-    debugger;
     var Observable = require("FuseJS/Observable")
 		var GridUtility = require("./js/GridUtility");
     var ObservableUtility = require("./js/ObservableUtility");
-    var TicTacToeManager = require("./js/TicTacToeManager");
-		var cells = GridUtility.createGrid(3, 3, "5", true, true);
-    var cellObservables = ObservableUtility.observeEachItem(cells);
-    var sequenceStates = TicTacToeManager.createSequences(cellObservables, 3);
-    var turn = Observable('X');
-    var madeMove = Observable(false);
-    var status = Observable("X's Turn");
-    var gameOver = Observable(false);
+    var SequenceManager = require("./js/SequenceManager");
+    var cells, cellObservables, sequenceStates, turn, madeMove, status, gameOver,
+        completeSequencesNumber, incompleteSequencesNumber, gameState;
 
-    var completeSequencesNumber = sequenceStates.count(function (state) {
-      return state === 'complete';
-    });
+    var start = function () {
+      cells = GridUtility.createGrid(3, 3, "5", true, true);
+      cellObservables = ObservableUtility.observeEachItem(cells);
+      sequenceStates = SequenceManager.createSequences(cellObservables, 3);
+      turn = Observable('X');
+      madeMove = Observable(false);
+      status = Observable("X's Turn");
+      gameOver = Observable(false);
 
-    var incompleteSequencesNumber = sequenceStates.count(function (state) {
-      return state === 'incomplete';
-    });
+      completeSequencesNumber = sequenceStates.count(function (state) {
+        return state === 'complete';
+      });
 
-    var gameState = Observable(function() {
-      var value = "";
-      if(completeSequencesNumber.value > 0) {
-        value = "winner";
-      } else if(incompleteSequencesNumber.value === 0) {
-        value = "draw";
-      } else {
-        value = "turn";
-      }
-      return value;
-    });
-  
-    gameState.addSubscriber(function(state) {
-      if(state.value === "winner") {
-        status.value = turn.value + " Won!";
-        gameOver.value = true;
-      } else if(state.value === "draw" && !gameOver.value) {
-        status.value = "Draw";
-        gameOver.value = true;
-      } else if(state.value === "turn" && madeMove.value && !gameOver.value) {
-        madeMove.value = false;
-        turn.value = turn.value === "X" ? "O" : "X";
-        status.value = turn.value + "'s Turn";
-      }
-    });
+      incompleteSequencesNumber = sequenceStates.count(function (state) {
+        return state === 'incomplete';
+      });
 
-    var makeMove = function(args) { 
+      gameState = Observable(function() {
+        var value = "";
+        if(completeSequencesNumber.value > 0) {
+          value = "winner";
+        } else if(incompleteSequencesNumber.value === 0) {
+          value = "draw";
+        } else if(madeMove.value){
+          value = "turn";
+        }
+        return value;
+      });
+
+      gameState.addSubscriber(function(state) {
+        if(state.value === "winner") {
+          status.value = turn.value + " Won!";
+          gameOver.value = true;
+        } else if(state.value === "draw" && !gameOver.value) {
+          status.value = "Draw";
+          gameOver.value = true;
+        } else if(state.value === "turn" && !gameOver.value) {
+          madeMove.value = false;
+          var tempTurn = turn.value === "X" ? "O" : "X";
+          status.value = tempTurn + "'s Turn";
+          turn.value = tempTurn;
+        }
+      });
+    };
+
+    
+
+    var makeMove = function(args) {
       var index = args.index;
       var cell = cellObservables[index].value;
       if(cell.contents === "" && !gameOver.value) {
+				cell.contents = turn.value;
+				cellObservables[index].value = cell;
         madeMove.value = true;
-        cell.contents = turn.value;
-        cellObservables[index].value = cell;
       }
     };
+
+    start();
+
 		module.exports = { cells: cellObservables, EventHandler: makeMove, status: status };
 	</JavaScript>
-  <StackPanel>
-    <Grid RowCount="3" Rows="1*,1*,1*" ColumnCount="3" Columns="1*,1*,1*" Height="60%">
+  <DockPanel>
+    <Panel Dock="Top" Height="20%">
+      <Text Value="Tic Tac Toe" Alignment="Center"/>
+    </Panel>
+    <Grid Dock="Fill" RowCount="3" Rows="1*,1*,1*" ColumnCount="3" Columns="1*,1*,1*">
       <Each Items="{cells}">
         <BorderedElement Row="{position.row}" Column="{position.column}" TemplateToInclude="CellTemplate" Top="{borderWidths.top}" Bottom="{borderWidths.bottom}" Left="{borderWidths.left}" Right="{borderWidths.right}" BorderColor="#abd3ff">
           <EventButton ux:Template="CellTemplate" Text="{contents}" ClickedArgs="{position}" BackgroundColor="#1483ff" TextColor="#abd3ff" >
@@ -68,9 +81,11 @@
         </BorderedElement>
       </Each>
     </Grid>
-    <StackPanel Height="20%" Orientation="Horizontal">
-      <Text Value="GameStatus: " />
-      <Text Value="{status}" />
+    <StackPanel Dock="Bottom" Height="20%">
+      <StackPanel Alignment="Center" Orientation="Horizontal">
+        <Text Value="GameStatus: " />
+        <Text Value="{status}" />
+      </StackPanel>
     </StackPanel>
-  </StackPanel>
+  </DockPanel>
 </App>

@@ -6,6 +6,7 @@ function Sequence(length, stateObservables) {
   var mixed = false;
   var sequenceIndex = stateObservables.length;
   stateObservables.add("incomplete");
+
   var update = function(cellObservable) {
     var value = cellObservable.value;
     var move = cellObservable.value.contents;
@@ -15,27 +16,15 @@ function Sequence(length, stateObservables) {
     if (!initialMove) {
       initialMove = move;
     }
-    
+
     mixed = initialMove !== move ? true : false;
     numOfMoves++;
-    
-    var state = ""
+
     if (!mixed && numOfMoves === length) {
-      state = "complete";
+      stateObservables.replaceAt(sequenceIndex, "complete");
     } else if(mixed) {
-      state = "unattainable";
-    } else {
-      state = "incomplete";
+      stateObservables.replaceAt(sequenceIndex, "unattainable");
     }
-    stateObservables.replaceAt(sequenceIndex, state);
-
-    // console.log("Cell Row: " + value.position.row);
-    // console.log("Cell Column: " + value.position.column);
-    // console.log("Sequence Index: " + sequenceIndex);
-    // console.log("Sequence Initial Move: " + initialMove);
-    // console.log("Sequence Num Of Moves: " + numOfMoves);
-    // console.log("Sequence State: " + stateObservables.getAt(sequenceIndex).value);
-
   };
 
   return {
@@ -74,7 +63,7 @@ function createSequences(cellObservables, sequenceLength) {
       cellObservable.addSubscriber(leftToRightDiagonalSequence.update);
     }
     //right to left diagonal sequences marked by cells with row plus column being equal to sequence length minus one
-    if (row + column === (sequenceLength - 1)) { 
+    if (row + column === (sequenceLength - 1)) {
       cellObservable.addSubscriber(rightToLefttDiagonalSequence.update);
     }
   });
