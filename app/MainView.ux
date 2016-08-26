@@ -31,7 +31,7 @@
         } else if(incompleteSequencesNumber.value === 0) {
           value = "draw";
         } else if(madeMove.value){
-          value = "turn";
+          value = "nextTurn";
         }
         return value;
       });
@@ -43,7 +43,7 @@
         } else if(state.value === "draw" && !gameOver.value) {
           status.value = "Draw";
           gameOver.value = true;
-        } else if(state.value === "turn" && !gameOver.value) {
+        } else if(state.value === "nextTurn" && !gameOver.value) {
           madeMove.value = false;
           var tempTurn = turn.value === "X" ? "O" : "X";
           status.value = tempTurn + "'s Turn";
