@@ -52,8 +52,6 @@
       });
     };
 
-    
-
     var makeMove = function(args) {
       var index = args.index;
       var cell = cellObservables[index].value;
@@ -83,7 +81,7 @@
     </Grid>
     <StackPanel Dock="Bottom" Height="20%">
       <StackPanel Alignment="Center" Orientation="Horizontal">
-        <Text Value="GameStatus: " />
+        <Text Value="Game Status: " />
         <Text Value="{status}" />
       </StackPanel>
     </StackPanel>
