@@ -9,6 +9,7 @@ git clone --recursive https://github.com/509dave16/fuse-tic-tac-toe.git
 
 # Summary of Implementation
 The gist of the implementation is this:
+
 1. A list of observable Cells is observed by Sequences and the UX representation of the cells.
 	- Each Sequence is subscribed to the appropriate Cell observables(i.e. the first row Sequence is subscribed to Cells at (0,0), (0,1), (0,2))
 	- Each Sequence produces essentially a Sequence State observable that could have one of the following values: incomplete, unattainable, complete
