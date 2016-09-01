@@ -1,6 +1,7 @@
 <App>
 	<JavaScript>
-    var Observable = require("FuseJS/Observable")
+    var Observable = require("FuseJS/Observable");
+    var ObservableProxy = require("DSF/ObservableProxy");
 		var GridUtility = require("./js/GridUtility");
     var ObservableUtility = require("./js/ObservableUtility");
     var SequenceManager = require("./js/SequenceManager");
